@@ -554,7 +554,7 @@ textarea.input {
   visibility: hidden;
 }
 
-.dropdown.open>.cart-dropdown {
+.dropdown:hover>.cart-dropdown {
   opacity: 1;
   visibility: visible;
 }
