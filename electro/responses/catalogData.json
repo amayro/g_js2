@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Notebook",
+    "category": "Laptops",
+    "image": "./img/product01.png",
+    "price": 2200,
+    "sale": 30,
+    "kind": "NEW",
+    "rating": 4
+  },
+  {
+    "title": "Headphones",
+    "category": "Accessories",
+    "image": "./img/product02.png",
+    "price": 190,
+    "sale": 0,
+    "kind": "HOT",
+    "rating": 3
+  },
+  {
+    "title": "Notebook",
+    "category": "Laptops",
+    "image": "./img/product03.png",
+    "price": 1700,
+    "sale": 15,
+    "kind": "",
+    "rating": 4
+  },
+  {
+    "title": "Tablet",
+    "category": "Laptops",
+    "image": "./img/product04.png",
+    "price": 900,
+    "sale": 0,
+    "kind": "",
+    "rating": 0
+  }
+]
