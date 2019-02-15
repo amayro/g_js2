@@ -1,7 +1,7 @@
 "use strict";
 
 const responseCatalogData = 'https://api.myjson.com/bins/1ah9pa';
-const responseBasket = 'https://api.myjson.com/bins/1czafy';
+const responseGetBasket = 'https://api.myjson.com/bins/1czafy';
 
 class ProductsList {
     constructor(container = '.products-slick') {
