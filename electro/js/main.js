@@ -34,6 +34,7 @@ class ProductsList {
         const block = document.querySelector(this.container);
         for (let product of this.goods) {
             const productObj = new ProductItem(
+                product.id_product,
                 product.title,
                 product.category,
                 product.image,
@@ -50,7 +51,8 @@ class ProductsList {
 }
 
 class ProductItem {
-    constructor(title, category, image, price, sale, kind, rating) {
+    constructor(id_product, title, category, image, price, sale, kind, rating) {
+        this.id_product = id_product;
         this.title = title;
         this.category = category;
         this.image = image;
@@ -123,6 +125,7 @@ class ProductItem {
                         </div>
                         <div class="add-to-cart">
                             <button class="add-to-cart-btn" 
+                                data-id_product="${this.id_product}"
                                 data-name="${this.title}"
                                 data-price="${this.price}"
                                 data-image="${this.image}"><i class="fa fa-shopping-cart"></i> add to cart</button>
@@ -189,9 +192,10 @@ class Basket {
     /** Обработчик события клика для покупки товара */
     containerClickHandler(event) {
         this.currentObj = {
+            id_product: +event.target.dataset.id_product,
             title: event.target.dataset.name,
             image: event.target.dataset.image,
-            price: event.target.dataset.price,
+            price: +event.target.dataset.price,
             count: 1,
         };
         const parentEl = event.target.parentElement;
@@ -203,7 +207,7 @@ class Basket {
         } else if (event.target.classList.contains(this.settings.delCartOrderClass) ||
             parentEl.classList.contains(this.settings.delCartOrderClass)) {
             if (parentEl.classList.contains(this.settings.delCartOrderClass)) {
-                this.currentObj.title = parentEl.dataset.name
+                this.currentObj.id_product = +parentEl.dataset.id_product
             }
             this.deleteOrder();
         }
@@ -237,6 +241,7 @@ class Basket {
         for (let order of this.orders) {
             console.log('order', order);
             const orderObj = new BasketItem(
+                order.id_product,
                 order.title,
                 order.image,
                 order.price,
@@ -259,8 +264,8 @@ class Basket {
      * Добавляет купленный товар в массив купленных товаров и отображает количество и цену всех товаров.
      */
     addOrder() {
-        if (this.orders.some(el => el.title === this.currentObj.title)) {
-            this.orders.forEach((el) => el.title === this.currentObj.title ? el.count++ : el.count);
+        if (this.orders.some(el => el.id_product === this.currentObj.id_product)) {
+            this.orders.forEach((el) => el.id_product === this.currentObj.id_product ? el.count++ : el.count);
         } else {
             console.log('its new item, add to cart');
             this.orders.push(this.currentObj)
@@ -273,7 +278,7 @@ class Basket {
      */
     reduceOrder(target) {
         for (let order of this.orders) {
-            if (order.title === this.currentObj.title) {
+            if (order.id_product === this.currentObj.id_product) {
                 order.count--;
                 if (order.count === 0) {
                     this.deleteOrder(target);
@@ -288,7 +293,7 @@ class Basket {
      */
     deleteOrder() {
         for (let order of this.orders) {
-            if (order.title === this.currentObj.title) {
+            if (order.id_product === this.currentObj.id_product) {
                 const idx = this.orders.indexOf(order);
                 this.orders.splice(idx, 1);
             }
@@ -299,7 +304,8 @@ class Basket {
 }
 
 class BasketItem {
-    constructor(title, image, price, count) {
+    constructor(id_product, title, image, price, count) {
+        this.id_product = id_product;
         this.title = title;
         this.image = image;
         this.price = price;
@@ -316,7 +322,7 @@ class BasketItem {
                         <h3 class="product-name"><a href="#">${this.title}</a></h3>
                         <h4 class="product-price"><span class="qty">${this.count}x</span>$${this.price}</h4>
                     </div>
-                    <button class="delete" data-name="${this.title}"><i class="fa fa-close"></i></button>
+                    <button class="delete" data-id_product="${this.id_product}"><i class="fa fa-close"></i></button>
                 </div>`
     }
 }
