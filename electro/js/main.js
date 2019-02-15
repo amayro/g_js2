@@ -1,44 +1,6 @@
 "use strict";
 
-const productsData = [
-    {
-        title: 'Notebook',
-        category: 'Laptops',
-        image: './img/product01.png',
-        price: 2200,
-        sale: 30,
-        kind: 'NEW',
-        rating: 4,
-    },
-    {
-        title: 'Headphones',
-        category: 'Accessories',
-        image: './img/product02.png',
-        price: 190,
-        sale: 0,
-        kind: 'HOT',
-        rating: 3,
-    },
-    {
-        title: 'Notebook',
-        category: 'Laptops',
-        image: './img/product03.png',
-        price: 1700,
-        sale: 15,
-        kind: '',
-        rating: 4,
-    },
-    {
-        title: 'Tablet',
-        category: 'Laptops',
-        image: './img/product04.png',
-        price: 900,
-        sale: 0,
-        kind: '',
-        rating: 0,
-    },
-
-];
+const respCatalogData = 'https://api.myjson.com/bins/d01l2';
 
 class ProductsList {
     constructor(container = '.products-slick') {
@@ -49,7 +11,13 @@ class ProductsList {
     }
 
     _getProducts() {
-        this.goods = productsData;
+        fetch(`${respCatalogData}`)
+            .then(result => result.json())
+            .then(data => {
+                this.goods = data;
+                this.render();
+            })
+            .catch(error => console.log(error));
     }
 
     getProductsPrice() {
@@ -159,6 +127,11 @@ class Basket {
         this.countSelector = countSelector;
         this.priceSelector = priceSelector;
         this.orders = [];
+        this.currentObj = {
+            title: null,
+            price: null,
+            count: null,
+        };
     }
 
     getOrdersCount() {
@@ -179,8 +152,39 @@ class Basket {
         document.querySelector(this.priceSelector).innerText = this.getOrdersPrice();
     }
 
+    addOrder() {
+        if (this.orders.some(el => el.title === this.currentObj.title)) {
+            this.orders.forEach((el) => el.title === this.currentObj.title ? el.count++ : el.count);
+        } else {
+            console.log('not');
+            this.orders.push(this.currentObj)
+        }
+        this.render();
+    }
+
+    reduceOrder(target) {
+        for (let order of this.orders) {
+            if (order.title === this.currentObj.title) {
+                order.count--;
+                if (order.count === 0) {
+                    this.deleteOrder(target);
+                }
+            }
+        }
+        this.render();
+    }
+
+    deleteOrder() {
+        for (let order of this.orders) {
+            if (order.title === this.currentObj.title) {
+                const idx = this.orders.indexOf(order);
+                this.orders.splice(idx);
+            }
+        }
+        this.render();
+    }
+
 }
 
 
 let products = new ProductsList();
-products.render();
