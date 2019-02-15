@@ -1,6 +1,7 @@
 [
   {
-    "title": "Notebook",
+    "id_product": 1,
+    "title": "Notebook N1",
     "category": "Laptops",
     "image": "./img/product01.png",
     "price": 2200,
@@ -9,6 +10,7 @@
     "rating": 4
   },
   {
+    "id_product": 2,
     "title": "Headphones",
     "category": "Accessories",
     "image": "./img/product02.png",
@@ -18,7 +20,8 @@
     "rating": 3
   },
   {
-    "title": "Notebook",
+    "id_product": 3,
+    "title": "Notebook N2",
     "category": "Laptops",
     "image": "./img/product03.png",
     "price": 1700,
@@ -27,6 +30,7 @@
     "rating": 4
   },
   {
+    "id_product": 4,
     "title": "Tablet",
     "category": "Laptops",
     "image": "./img/product04.png",

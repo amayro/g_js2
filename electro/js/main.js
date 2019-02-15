@@ -1,6 +1,7 @@
 "use strict";
 
-const respCatalogData = 'https://api.myjson.com/bins/d01l2';
+const responseCatalogData = 'https://api.myjson.com/bins/1ah9pa';
+const responseBasket = 'https://api.myjson.com/bins/1czafy';
 
 class ProductsList {
     constructor(container = '.products-slick') {
@@ -10,8 +11,9 @@ class ProductsList {
         this._getProducts();
     }
 
+    /** Собирает каталог продуктов из json с сервера */
     _getProducts() {
-        fetch(`${respCatalogData}`)
+        fetch(`${responseCatalogData}`)
             .then(result => result.json())
             .then(data => {
                 this.goods = data;
@@ -20,12 +22,14 @@ class ProductsList {
             .catch(error => console.log(error));
     }
 
+    /** Подсчитывает общую стоимость всех продуктов в каталоге */
     getProductsPrice() {
         let price = 0;
         this.allProducts.forEach(el => price += el.price);
         return price
     }
 
+    /** Генерирует и отображает html цены товара для вывода каталога товаров  */
     render() {
         const block = document.querySelector(this.container);
         for (let product of this.goods) {
@@ -56,16 +60,19 @@ class ProductItem {
         this.rating = rating;
     }
 
+    /** Генерирует html скидки товара для вывода товара  */
     blockSale() {
         const blSale = `<span class="sale">-${this.sale}%</span>`;
         return this.sale ? blSale : ''
     }
 
+    /** Генерирует html вида (предложения) товара для вывода товара  */
     blockKind() {
         const blKind = `<span class="new">${this.kind}</span>`;
         return this.kind ? blKind : ''
     }
 
+    /** Генерирует html цены товара для вывода товара  */
     blockPrice() {
         let oldPrice = null;
         let blOldPrice = '';
@@ -79,6 +86,7 @@ class ProductItem {
         return `<h4 class="product-price">$${this.price} ${blOldPrice}</h4>`
     }
 
+    /** Генерирует html рейтинга товара для вывода товара  */
     blockRating() {
         let rating_stars = '';
 
@@ -91,6 +99,7 @@ class ProductItem {
         return `<div class="product-rating">${rating_stars}</div>`
     }
 
+    /** Генерирует html товара для вывода на страницу.  */
     render() {
         return `<div class="product">
                         <div class="product-img">
@@ -113,55 +122,155 @@ class ProductItem {
                             </div>
                         </div>
                         <div class="add-to-cart">
-                            <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                            <button class="add-to-cart-btn" 
+                                data-name="${this.title}"
+                                data-price="${this.price}"
+                                data-image="${this.image}"><i class="fa fa-shopping-cart"></i> add to cart</button>
                         </div>
                     </div>`
     }
 }
 
 class Basket {
-    constructor(containerSelector = '#cart',
+    constructor(containerSelector = '.cart-container-click',
+                containerCartList = '.cart-list',
                 countSelector = '.basket-count',
-                priceSelector = '#basket-price') {
-        this.containerSelector = containerSelector;
-        this.countSelector = countSelector;
-        this.priceSelector = priceSelector;
-        this.orders = [];
-        this.currentObj = {
-            title: null,
-            price: null,
-            count: null,
+                priceSelector = '.basket-price',
+                addCartOrderClass = 'add-to-cart-btn',
+                redCartOrderClass = 'reduce-order-btn',
+                delCartOrderClass = 'delete',
+    ) {
+        this.settings = {
+            containerSelector: containerSelector,
+            containerCartList: containerCartList,
+            countSelector: countSelector,
+            priceSelector: priceSelector,
+            addCartOrderClass: addCartOrderClass,
+            redCartOrderClass: redCartOrderClass,
+            delCartOrderClass: delCartOrderClass,
         };
+
+        this.orders = [];
+        this.allOrders = [];
+        this.currentObj = {};
+        this._getBasket();
+        this.init();
     }
 
+    /** Собирает корзину из json с сервера */
+    _getBasket() {
+        fetch(`${responseBasket}`)
+            .then(result => result.json())
+            .then(data => {
+                this.orders = data;
+
+                for (let order of this.orders) {
+                    if (order.sale) {
+                        order.price = order.price * (1 - order.sale / 100);
+                    }
+                }
+                this.render();
+            })
+            .catch(error => console.log(error));
+    }
+
+    /**
+     * Инициализирует переменные для корзины и показывает эти значения.
+     */
+    init() {
+        const containerClick = document.querySelectorAll(this.settings.containerSelector);
+        for (let container of containerClick) {
+            container.addEventListener('click', event => this.containerClickHandler(event));
+        }
+
+        this.render();
+    }
+
+    /** Обработчик события клика для покупки товара */
+    containerClickHandler(event) {
+        this.currentObj = {
+            title: event.target.dataset.name,
+            image: event.target.dataset.image,
+            price: event.target.dataset.price,
+            count: 1,
+        };
+        const parentEl = event.target.parentElement;
+
+        if (event.target.classList.contains(this.settings.addCartOrderClass)) {
+            this.addOrder();
+        } else if (event.target.classList.contains(this.settings.redCartOrderClass)) {
+            this.reduceOrder();
+        } else if (event.target.classList.contains(this.settings.delCartOrderClass) ||
+            parentEl.classList.contains(this.settings.delCartOrderClass)) {
+            if (parentEl.classList.contains(this.settings.delCartOrderClass)) {
+                this.currentObj.title = parentEl.dataset.name
+            }
+            this.deleteOrder();
+        }
+    }
+
+    /**
+     * Считает и возвращает количество всех купленных товаров из массива this.orders.
+     * @returns {number} Число всех купленных товаров.
+     */
     getOrdersCount() {
         let count = 0;
         this.orders.forEach((el) => count += el.count);
         return count
     }
 
-
+    /**
+     * Считает и возвращает цену всех купленных товаров из массива this.orders.
+     * @returns {number} Число всех купленных товаров.
+     */
     getOrdersPrice() {
         let price = 0;
         this.orders.forEach((el) => price += el.price * el.count);
         return price
     }
 
+    /** Отображает все товары, их количество и цену.  */
     render() {
-        document.querySelector(this.countSelector).innerText = this.getOrdersCount();
-        document.querySelector(this.priceSelector).innerText = this.getOrdersPrice();
+        const block = document.querySelector(this.settings.containerCartList);
+        let ordersHtml = '';
+
+        for (let order of this.orders) {
+            console.log('order', order);
+            const orderObj = new BasketItem(
+                order.title,
+                order.image,
+                order.price,
+                order.count,
+            );
+            this.allOrders.push(orderObj);
+            ordersHtml += orderObj.render();
+        }
+        block.innerHTML = ordersHtml ? ordersHtml : '<h5>Cart is empty</h5>';
+
+        const containerCount = document.querySelectorAll(this.settings.countSelector);
+        for (let container of containerCount) {
+            container.innerText = this.getOrdersCount()
+        }
+
+        document.querySelector(this.settings.priceSelector).innerText = this.getOrdersPrice();
     }
 
+    /**
+     * Добавляет купленный товар в массив купленных товаров и отображает количество и цену всех товаров.
+     */
     addOrder() {
         if (this.orders.some(el => el.title === this.currentObj.title)) {
             this.orders.forEach((el) => el.title === this.currentObj.title ? el.count++ : el.count);
         } else {
-            console.log('not');
+            console.log('its new item, add to cart');
             this.orders.push(this.currentObj)
         }
         this.render();
     }
 
+    /**
+     * Уменьшает число заказов товара из корзины и отображает количество и цену всех товаров.
+     */
     reduceOrder(target) {
         for (let order of this.orders) {
             if (order.title === this.currentObj.title) {
@@ -174,11 +283,14 @@ class Basket {
         this.render();
     }
 
+    /**
+     * Удаляет товар из массива и отображает количество и цену всех товаров.
+     */
     deleteOrder() {
         for (let order of this.orders) {
             if (order.title === this.currentObj.title) {
                 const idx = this.orders.indexOf(order);
-                this.orders.splice(idx);
+                this.orders.splice(idx, 1);
             }
         }
         this.render();
@@ -186,5 +298,29 @@ class Basket {
 
 }
 
+class BasketItem {
+    constructor(title, image, price, count) {
+        this.title = title;
+        this.image = image;
+        this.price = price;
+        this.count = count;
+    }
+
+    /** Генерирует html товара для вывода на страницу.  */
+    render() {
+        return `<div class="product-widget">
+                    <div class="product-img">
+                        <img src="${this.image}" alt="">
+                    </div>
+                    <div class="product-body">
+                        <h3 class="product-name"><a href="#">${this.title}</a></h3>
+                        <h4 class="product-price"><span class="qty">${this.count}x</span>$${this.price}</h4>
+                    </div>
+                    <button class="delete" data-name="${this.title}"><i class="fa fa-close"></i></button>
+                </div>`
+    }
+}
+
 
 let products = new ProductsList();
+let cart = new Basket();
