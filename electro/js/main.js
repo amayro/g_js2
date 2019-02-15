@@ -162,7 +162,7 @@ class Basket {
 
     /** Собирает корзину из json с сервера */
     _getBasket() {
-        fetch(`${responseBasket}`)
+        fetch(`${responseGetBasket}`)
             .then(result => result.json())
             .then(data => {
                 this.orders = data;
