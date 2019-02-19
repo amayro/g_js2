@@ -33,16 +33,7 @@ class ProductsList {
     render() {
         const block = document.querySelector(this.container);
         for (let product of this.goods) {
-            const productObj = new ProductItem(
-                product.id_product,
-                product.title,
-                product.category,
-                product.image,
-                product.price,
-                product.sale,
-                product.kind,
-                product.rating
-            );
+            const productObj = new ProductItem(product);
             this.allProducts.push(productObj);
             block.insertAdjacentHTML('beforeend', productObj.render());
         }
@@ -51,15 +42,15 @@ class ProductsList {
 }
 
 class ProductItem {
-    constructor(id_product, title, category, image, price, sale, kind, rating) {
-        this.id_product = id_product;
-        this.title = title;
-        this.category = category;
-        this.image = image;
-        this.price = price;
-        this.sale = sale;
-        this.kind = kind;
-        this.rating = rating;
+    constructor(product) {
+        this.id_product = product.id_product;
+        this.title = product.title;
+        this.category = product.category;
+        this.image = product.image;
+        this.price = product.price;
+        this.sale = product.sale;
+        this.kind = product.kind;
+        this.rating = product.rating;
     }
 
     /** Генерирует html скидки товара для вывода товара  */
@@ -240,13 +231,7 @@ class Basket {
 
         for (let order of this.orders) {
             console.log('order', order);
-            const orderObj = new BasketItem(
-                order.id_product,
-                order.title,
-                order.image,
-                order.price,
-                order.count,
-            );
+            const orderObj = new BasketItem(order);
             this.allOrders.push(orderObj);
             ordersHtml += orderObj.render();
         }
@@ -304,12 +289,12 @@ class Basket {
 }
 
 class BasketItem {
-    constructor(id_product, title, image, price, count) {
-        this.id_product = id_product;
-        this.title = title;
-        this.image = image;
-        this.price = price;
-        this.count = count;
+    constructor(order) {
+        this.id_product = order.id_product;
+        this.title = order.title;
+        this.image = order.image;
+        this.price = order.price;
+        this.count = order.count;
     }
 
     /** Генерирует html товара для вывода на страницу.  */
