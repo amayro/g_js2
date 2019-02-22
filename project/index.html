@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Интернет-магазин</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.7.2/js/all.js"
+            integrity="sha384-0pzryjIRos8mFBWMzSSZApWtPl/5++eIfzYmTgBBmXYdhvxPc+XcFEk+zJwDgWbP"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+    <header>
+        <div class="logo">E-shop</div>
+        <div class="cart">
+
+            <form action="#" class="search-form">
+                <input type="text" v-model="search" class="search-field">
+                <button class="btn-search" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <button class="btn-cart" @click="show = !show" type="button">Корзина</button>
+
+            <div v-show="show" class="cart-block">
+
+                <template v-if="orders.length">
+                    <div class="cart-item"
+                         v-for="item of orders"
+                         :key="item.id_product">
+                        <div class="product-bio">
+                            <img :src="imgCart" alt="Some img">
+                            <div class="product-desc">
+                                <p class="product-title">{{ item.product_name }}</p>
+                                <p class="product-quantity">Quantity: {{ item.quantity }}</p>
+                                <p class="product-single-price">${{item.price}} each</p>
+                            </div>
+                        </div>
+                        <div class="right-block">
+                            <p class="product-price">${{ item.quantity * item.price }}</p>
+                            <button class="del-btn" @click="delOrder(item)">&times;</button>
+                        </div>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="cart-item">Cart is empty</div>
+                </template>
+            </div>
+
+
+        </div>
+    </header>
+    <main>
+        <div class="products">
+            <div class="product-item"
+                 v-for="item of filteredProduct"
+                 :key="item.id_product">
+                <img :src="imgCatalog" alt="Some img">
+                <div class="desc">
+                    <h3>{{ item.product_name }}</h3>
+                    <p>${{ item.price }}</p>
+                    <button class="buy-btn" :data-product="item"
+                            @click="addOrder(item)">Купить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
