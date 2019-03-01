@@ -7,14 +7,14 @@ const app = new Vue({
         userSearch: ''
     },
     methods: {
-      getJson: function(url){
-          return fetch(url)
-            .then(result => result.json())
-            .catch(error => {
-                this.$refs.error.text = error;
-            });
-      },
-        postJson: function(url, data){
+        getJson: function (url) {
+            return fetch(url)
+                .then(result => result.json())
+                .catch(error => {
+                    this.$refs.error.text = error;
+                });
+        },
+        postJson: function (url, data) {
             return fetch(url, {
                 method: 'POST',
                 headers: {
@@ -27,9 +27,22 @@ const app = new Vue({
                     this.$refs.error.text = error;
                 });
         },
-        putJson: function(url, data){
+        putJson: function (url, data) {
             return fetch(url, {
                 method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+                .then(result => result.json())
+                .catch(error => {
+                    this.$refs.error.text = error;
+                });
+        },
+        deleteJson: function (url, data) {
+            return fetch(url, {
+                method: 'DELETE',
                 headers: {
                     "Content-Type": "application/json"
                 },

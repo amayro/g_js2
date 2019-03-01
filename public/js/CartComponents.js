@@ -1,60 +1,57 @@
 Vue.component('cart', {
-    data: function(){
+    data: function () {
         return {
             imgCart: 'https://placehold.it/50x100',
             cartItems: [],
-            showCart: false
+            showCart: true
         }
     },
     methods: {
-        addProduct: function(item){
+        addProduct: function (item) {
             let find = this.cartItems.find(el => el.id_product === item.id_product);
             if (find) {
                 this.$parent.putJson(`/api/cart/${find.id_product}`, {quantity: 1})
                     .then(data => {
-                        if(data.result === 1){
+                        if (data.result === 1) {
                             find.quantity++
                         }
                     })
             } else {
-                let prod = Object.assign({quantity:1}, item);
-                this.$parent.postJson('/api/cart', Object.assign({quantity:1}, item))
+                let prod = Object.assign({quantity: 1}, item);
+                this.$parent.postJson('/api/cart', Object.assign({quantity: 1}, item))
                     .then(data => {
-                        if(data.result === 1){
+                        if (data.result === 1) {
                             this.cartItems.push(prod)
                         }
                     })
             }
-            // this.$parent.getJson(`${API}/addToBasket.json`)
-            //     .then(data => {
-            //         if(data.result === 1){
-            //             let find = this.cartItems.find(el => el.id_product === item.id_product);
-            //             if(find){
-            //                 find.quantity++;
-            //             } else {
-            //                 let prod = Object.assign({quantity:1}, item);
-            //                 this.cartItems.push(prod)
-            //             }
-            //         }
-            //     })
+
         },
-        remove(item){
-            this.$parent.getJson(`${API}/deleteFromBasket.json`)
-                .then(data => {
-                    if(data.result === 1){
-                        if(item.quantity>1){
-                            item.quantity--;
-                        } else{
-                            this.cartItems.splice(this.cartItems.indexOf(item), 1);
-                        }
-                    }
-                })
+        remove(item) {
+            let find = this.cartItems.find(el => el.id_product === item.id_product);
+            if (find) {
+                if (find.quantity > 1) {
+                    this.$parent.putJson(`/api/cart/${find.id_product}`, {quantity: -1})
+                        .then(data => {
+                            if (data.result === 1) {
+                                find.quantity--
+                            }
+                        })
+                } else {
+                    this.$parent.deleteJson(`/api/cart/${find.id_product}`)
+                        .then(data => {
+                            if (data.result === 1) {
+                                this.cartItems.splice(this.cartItems.indexOf(item), 1);
+                            }
+                        })
+                }
+            }
         },
     },
-    created(){
+    created() {
         this.$parent.getJson(`/api/cart`)
             .then(data => {
-                for (let item of data.contents){
+                for (let item of data.contents) {
                     this.$data.cartItems.push(item);
                 }
             });
